@@ -29,11 +29,27 @@ class Schema
     /** @var Collection|Action[] */
     protected $actions;
 
+    protected bool $DefaultChangeTracking;
+    protected bool $DefaultDeleteRestrictions;
+    protected bool $DefaultUpdateRestrictions;
+    protected bool $DefaultInsertRestrictions;
+
     /** @var array */
     protected $raw = [], $overrides;
 
-    public function __construct(array $json)
+    public function __construct(
+        array $json,
+        bool $DefaultChangeTracking = false,
+        bool $DefaultDeleteRestrictions = false,
+        bool $DefaultUpdateRestrictions = false,
+        bool $DefaultInsertRestrictions = false
+    )
     {
+        $this->DefaultChangeTracking = $DefaultChangeTracking;
+        $this->DefaultDeleteRestrictions = $DefaultDeleteRestrictions;
+        $this->DefaultUpdateRestrictions = $DefaultUpdateRestrictions;
+        $this->DefaultInsertRestrictions = $DefaultInsertRestrictions;
+
         $this->version = $json['@attributes']['Version'];
 
         // check array keys are numeric, then we have multiple schemas
@@ -162,7 +178,7 @@ class Schema
             $type = $matches[1] ?? $type;
         }
 
-        $type = str_replace(['Microsoft.NAV.', 'NAV.', 'ComplexTypes.','mscrm.'], '', $type);
+        $type = str_replace(['Microsoft.NAV.', 'NAV.', 'ComplexTypes.','mscrm.', 'Microsoft.Dynamics.CRM.'], '', $type);
 
         return $type;
     }
@@ -229,5 +245,25 @@ class Schema
     public function propertyIsNullable(string $model, string $property, $default = false)
     {
         return $this->propertyIs($model, $property, 'nullable', $default);
+    }
+
+    public function isDefaultChangeTracking(): bool
+    {
+        return $this->DefaultChangeTracking;
+    }
+
+    public function isDefaultDeleteRestrictions(): bool
+    {
+        return $this->DefaultDeleteRestrictions;
+    }
+
+    public function isDefaultUpdateRestrictions(): bool
+    {
+        return $this->DefaultUpdateRestrictions;
+    }
+
+    public function isDefaultInsertRestrictions(): bool
+    {
+        return $this->DefaultInsertRestrictions;
     }
 }

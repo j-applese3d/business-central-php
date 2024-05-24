@@ -67,6 +67,12 @@ class SDK
         'logs_requests'           => false,
         'language'                => false,
         'target_dir'              => __DIR__,
+
+        // Default Restrictions
+        'change_tracking_default' => false,
+        'delete_restrictions_default' => false,
+        'update_restrictions_default' => false,
+        'insert_restrictions_default' => false,
     ];
 
     protected function __construct($APIUri, $tenant, $options)
@@ -208,7 +214,12 @@ class SDK
 
         $json = json_decode(json_encode(simplexml_load_string($raw), JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR);
 
-        $this->setSchema(new Schema($json));
+        $this->setSchema(new Schema($json,
+            $this->option('change_tracking_default'),
+            $this->option('delete_restrictions_default'),
+            $this->option('update_restrictions_default'),
+            $this->option('insert_restrictions_default'),
+        ));
 
         $this->classMap = new ClassMap($this->option('target_dir'));
     }

@@ -53,27 +53,27 @@ class EntitySet
 
     public function is(string $capability)
     {
-        return $this->annotations[$capability] ?? false;
+        return $this->annotations[$capability] ?? null;
     }
 
 
     public function changeTracked()
     {
-        return $this->is('ChangeTracking');
+        return $this->is('ChangeTracking') ?? $this->getSchema()->isDefaultChangeTracking();
     }
 
     public function deletable()
     {
-        return $this->is('DeleteRestrictions');
+        return $this->is('DeleteRestrictions') ?? $this->getSchema()->isDefaultDeleteRestrictions();
     }
 
     public function updatable()
     {
-        return $this->is('UpdateRestrictions');
+        return $this->is('UpdateRestrictions') ?? $this->getSchema()->isDefaultUpdateRestrictions();
     }
 
     public function insertable()
     {
-        return $this->is('InsertRestrictions');
+        return $this->is('InsertRestrictions') ?? $this->getSchema()->isDefaultInsertRestrictions();
     }
 }

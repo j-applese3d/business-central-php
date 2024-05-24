@@ -41,7 +41,7 @@ class NavigationProperty
         $this->schema = $schema;
         $this->name   = $this->schema->getAliases()[$property['@attributes']['Name']] ?? $property['@attributes']['Name'];
         $this->route  = $property['@attributes']['Name'];
-        $this->type   = $property['@attributes']['Type'];
+        $this->type   = Schema::getType($property['@attributes']['Type']);
 
         if ($this->isCollection()) {
             $this->name = Pluralizer::plural($this->name);
@@ -61,7 +61,7 @@ class NavigationProperty
     public function convert($value, Builder $query)
     {
         if ($this->isCollection()) {
-            $entity_set = $this->schema->getEntitySet($this->name);
+            $entity_set = $this->schema->getEntitySetByType($this->type);
 
             $expands = $query->getExpands()[$entity_set->name] ?? null;
             if ($expands instanceof Builder) {
@@ -74,13 +74,19 @@ class NavigationProperty
             }
 
             $query->navigateTo($this->name)
-                  ->setExpands($expands ?? []);
+                ->setExpands($expands ?? []);
 
             return new EntityCollection($query, $entity_set, $value);
         } else {
-            $entity_type = $this->schema->getEntityType($this->name);
+            $entity_type = $this->schema->getEntityType($this->type);
 
-            $query->navigateTo($this->name, $value['id']);
+            $keys = [];
+            foreach ($entity_type->keys as $key)
+            {
+                $keys[] = $value[$key];
+            }
+
+            $query->navigateTo($this->name, $keys);
 
             return new Entity($value, $query, $entity_type);
         }

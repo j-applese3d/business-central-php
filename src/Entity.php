@@ -124,6 +124,9 @@ class Entity implements \ArrayAccess, \JsonSerializable, Jsonable, Arrayable
                     }
                 };
             }
+            elseif (str_contains($key,'@odata.bind') ) {
+                $this->attributes[$key] = $attribute;
+            }
         }
     }
 
@@ -212,9 +215,10 @@ class Entity implements \ArrayAccess, \JsonSerializable, Jsonable, Arrayable
             }
             $response = $this->query->post($attributes);
 
-            $this->setAttributes($response);
-            $this->query->navigateTo($entity_set->name ?? Pluralizer::plural($this->type->schema_type), $this->identifiers());
-
+            if(!empty($response)) {
+                $this->setAttributes($response);
+                $this->query->navigateTo($entity_set->name ?? Pluralizer::plural($this->type->schema_type), $this->identifiers());
+            }
         }
 
         $this->dirty = [];
