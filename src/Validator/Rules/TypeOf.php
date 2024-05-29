@@ -48,6 +48,9 @@ class TypeOf extends Rule
                 return !!\DateTime::createFromFormat('Y-m-d', $value);
             case 'null':
                 return is_null($value);
+            case 'mixed':
+                // TODO temp fix for enumtypes
+                return true;
             default:
                 throw new \Exception("Unknown validation type $type in TypeOf rule");
         }
