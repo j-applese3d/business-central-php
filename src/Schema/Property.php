@@ -52,7 +52,7 @@ class Property
 
         $this->read_only = $this->schema->propertyIsReadOnly($entity_type->schema_type, $this->name, !$edit_allowed);
         $this->nullable  = $this->schema->propertyIsNullable($entity_type->schema_type, $this->name, !$edit_allowed) ||
-                           filter_var($property['@attributes']['Nullable'] ?? true, FILTER_VALIDATE_BOOLEAN);
+            filter_var($property['@attributes']['Nullable'] ?? true, FILTER_VALIDATE_BOOLEAN);
 
         $this->validation = [
             'max_length' => $property['@attributes']['MaxLength'] ?? null,
@@ -130,6 +130,15 @@ class Property
             case 'Edm.DateTimeOffset':
             case 'Edm.Date':
                 return 'date';
+            case 'Microsoft.NAV.customerBlocked':
+            case 'Microsoft.NAV.apt_HeHo_Webshop_Document_Type':
+            case 'Microsoft.NAV.contactType':
+            case 'Microsoft.NAV.apt_HeHo_Amount_Type':
+            case 'Microsoft.NAV.apt_HeHo_Division_Group':
+            case 'Microsoft.NAV.salesLineType':
+            case "Microsoft.NAV.apt_HeHo_WebshopOrderStatus":
+                // TODO Enumtypes berücksichtigen
+                return 'mixed';
             default:
                 if (strpos($this->type, 'ComplexTypes.') !== false) {
                     return $this->schema->getComplexType(Schema::getType($this->type));
@@ -152,6 +161,15 @@ class Property
             case 'Edm.Int32':
             case 'Edm.Int64':
                 return 'int';
+            case 'Microsoft.NAV.customerBlocked':
+            case 'Microsoft.NAV.apt_HeHo_Webshop_Document_Type':
+            case 'Microsoft.NAV.contactType':
+            case 'Microsoft.NAV.apt_HeHo_Amount_Type':
+            case 'Microsoft.NAV.apt_HeHo_Division_Group':
+            case 'Microsoft.NAV.salesLineType':
+            case "Microsoft.NAV.apt_HeHo_WebshopOrderStatus":
+                // TODO Enumtypes berücksichtigen
+                return 'mixed';
             default:
                 if (strpos($this->type, 'Microsoft.NAV.') !== false) {
                     return $this->schema->getComplexType(Schema::getType($this->type));
