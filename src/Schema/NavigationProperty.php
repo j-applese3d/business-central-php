@@ -31,6 +31,7 @@ class NavigationProperty
     use HasSchema;
 
     protected $name;
+    protected $isCollection = false;
     protected $type;
     protected $route;
 
@@ -41,6 +42,7 @@ class NavigationProperty
         $this->schema = $schema;
         $this->name   = $this->schema->getAliases()[$property['@attributes']['Name']] ?? $property['@attributes']['Name'];
         $this->route  = $property['@attributes']['Name'];
+        $this->isCollection = !!preg_match('/Collection\(.+\)/i', $property['@attributes']['Type']);
         $this->type   = Schema::getType($property['@attributes']['Type']);
 
         if ($this->isCollection()) {
@@ -50,7 +52,7 @@ class NavigationProperty
 
     public function isCollection()
     {
-        return !!preg_match('/Collection\(.+\)/i', $this->type);
+        return $this->isCollection;
     }
 
     public function getEntityType()
