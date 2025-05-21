@@ -126,7 +126,11 @@ class Schema
 
     public function getEntityTypeBySet(string $set)
     {
-        return $this->getEntitySet(static::getType($set))->getEntityType();
+        $entitySet = $this->entity_sets[$set] ?? null;
+        if($entitySet === null) {
+            $entitySet = $this->entity_sets[lcfirst($set)] ?? null;
+        }
+        return $entitySet;
     }
 
     // endregion
