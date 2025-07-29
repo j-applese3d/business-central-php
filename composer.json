@@ -1,5 +1,5 @@
 {
-    "name"        : "j-appleseed/business-central-sdk",
+    "name"        : "j-applese3d/business-central-sdk",
     "description" : "PHP SDK for Microsoft Business Central",
     "type"        : "library",
     "require"     : {
