@@ -9,6 +9,7 @@ namespace BusinessCentral\Validator\Rules;
 
 
 use BusinessCentral\Schema;
+use DateTime;
 use Rakit\Validation\Rule;
 
 class TypeOf extends Rule
@@ -29,30 +30,17 @@ class TypeOf extends Rule
 
         $this->key = "typeof:$type";
 
-        switch ($type) {
-            case 'required':
-                return !is_null($value);
-            case 'guid':
-                return preg_match('/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i', $value);
-            case 'string':
-                return is_string($value);
-            case 'int':
-                return is_int($value);
-            case 'float':
-            case 'double':
-                return is_int($value) || is_double($value) || is_float($value);
-            case 'bool':
-            case 'boolean':
-                return is_bool($value);
-            case 'date':
-                return !!\DateTime::createFromFormat('Y-m-d', $value);
-            case 'null':
-                return is_null($value);
-            case 'mixed':
-                // TODO temp fix for enumtypes
-                return true;
-            default:
-                throw new \Exception("Unknown validation type $type in TypeOf rule");
-        }
+        return match ($type) {
+            'required' => !is_null($value),
+            'guid' => preg_match('/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i', $value) !== false,
+            'string' => is_string($value),
+            'int' => is_int($value),
+            'float', 'double' => is_int($value) || is_float($value),
+            'bool', 'boolean' => is_bool($value),
+            'date' => (bool)DateTime::createFromFormat('Y-m-d', $value),
+            'null' => is_null($value),
+            'mixed' => true,
+            default => throw new \Exception("Unknown validation type $type in TypeOf rule"),
+        };
     }
 }

@@ -3,15 +3,16 @@
     "description" : "PHP SDK for Microsoft Business Central",
     "type"        : "library",
     "require"     : {
-        "php"                : "^8.1",
+        "php"                : "^8.3",
         "ext-json"           : "*",
-        "guzzlehttp/guzzle"  : "^7.4.5",
-        "illuminate/support" : "^10.0",
-        "rakit/validation"   : "^1.0"
+        "guzzlehttp/guzzle"  : "^7.9",
+        "illuminate/support" : "^12.21",
+        "rakit/validation"   : "^v1.4"
     },
     "require-dev" : {
         "symfony/var-dumper" : "^6.3",
-        "filp/whoops"        : "^2.15"
+        "filp/whoops"        : "^2.15",
+        "phpstan/phpstan" : "^2.1"
     },
     "license"     : "MIT",
     "authors"     : [

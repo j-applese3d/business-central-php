@@ -1,0 +1,13 @@
+parameters:
+    reportUnmatchedIgnoredErrors: false
+    parallel:
+        maximumNumberOfProcesses: 8
+        processTimeout: 3000.0
+    level: 0
+    paths:
+        - src
+    scanDirectories:
+        - src/
+        - vendor/
+    tips:
+        discoveringSymbols: false # learn more at: https://phpstan.org/user-guide/discovering-symbols

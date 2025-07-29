@@ -116,8 +116,7 @@ class Entity implements \ArrayAccess, \JsonSerializable, Jsonable, Arrayable
                 $mediaReadLink = $attribute;
                 $this->attributes[$attributeName] = function () use ($mediaReadLink) {
                     try{
-                        $response = $this->query->getSdk()->client->get($mediaReadLink);
-                        return $response->getBody();
+                        return $this->query->getSdk()->client->get($mediaReadLink)->getBody();
                     }
                     catch (\Throwable $e) {
                         return null;
@@ -311,16 +310,16 @@ class Entity implements \ArrayAccess, \JsonSerializable, Jsonable, Arrayable
 
             if ($property->isCollection()) {
                 return $this->relations[$relation] = $query->navigateTo($property->route)->fetch();
-            } else {
-                try {
-                    return $this->relations[$relation] = $query->navigateTo($property->route)->first();
-                } catch (QueryException $exception) {
-                    if ($exception->is('BadRequest_ResourceNotFound')) {
-                        return null;
-                    }
+            }
 
-                    throw $exception;
+            try {
+                return $this->relations[$relation] = $query->navigateTo($property->route)->first();
+            } catch (QueryException $exception) {
+                if ($exception->is('BadRequest_ResourceNotFound')) {
+                    return null;
                 }
+
+                throw $exception;
             }
         }
 
@@ -344,19 +343,23 @@ class Entity implements \ArrayAccess, \JsonSerializable, Jsonable, Arrayable
 
     // region Interfaces
 
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         if ($this->getEntityType()->propertyExists($offset)) {
             if( $this->attributes[$offset] instanceof \Closure ) {
                 return $this->attributes[$offset]();
             }
             return $this->attributes[$offset] ?? null;
-        } elseif ($this->getEntityType()->relationExists($offset)) {
+        }
+
+        if ($this->getEntityType()->relationExists($offset)) {
             return $this->fetchRelation($offset);
         }
+
+        return null;
     }
 
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         if (in_array($offset, $this->guarded)) {
             return;
@@ -377,13 +380,17 @@ class Entity implements \ArrayAccess, \JsonSerializable, Jsonable, Arrayable
         }
     }
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         if ($this->getEntityType()->propertyExists($offset)) {
             return isset($this->attributes[$offset]);
-        } elseif ($this->getEntityType()->relationExists($offset)) {
+        }
+
+        if ($this->getEntityType()->relationExists($offset)) {
             return isset($this->relations[$offset]);
         }
+
+        return false;
     }
 
     public function offsetUnset($offset)
@@ -401,13 +408,22 @@ class Entity implements \ArrayAccess, \JsonSerializable, Jsonable, Arrayable
         $this->offsetSet($name, $value);
     }
 
+    public function __isset(string $name): bool
+    {
+        return $this->offsetExists($name);
+    }
+
     public function __call($name, $arguments)
     {
         if ($relation = $this->getEntityType()->getRelation($name)) {
             return $this->query->cloneWithoutExtensions()->navigateTo($relation->route);
-        } elseif ($this->getEntityType()->actionExists($name)) {
+        }
+
+        if ($this->getEntityType()->actionExists($name)) {
             return $this->doAction($name);
         }
+
+        throw new \RuntimeException('Method ' . $name . ' does not exist on ' . __CLASS__);
     }
 
     public function toArray()
