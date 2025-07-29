@@ -1,5 +1,5 @@
 {
-    "name"        : "coolrunner/business-central-sdk",
+    "name"        : "j-appleseed/business-central-sdk",
     "description" : "PHP SDK for Microsoft Business Central",
     "type"        : "library",
     "require"     : {
